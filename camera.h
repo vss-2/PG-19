@@ -52,8 +52,13 @@ public:
 
     bool compute_pixel_coordinates(const vec3 &pWorld, vec2 &pRaster) 
     { 
-        return false; // Retornar verdadeiro se o ponto pode ser visto
+        //Converter pWorld para plano da câmera para o plano da câmera,
+        //fazer mudança de base, e vai ficar x y z.
+        //Jogar fora o 1 pq vec3 só aceita 3 parâmetros.
+        return false; 
+        // Retornar verdadeiro se o ponto pode ser visto
     }
+
 
     void render_scene( std::vector<Obj> objs, SDL_Renderer* renderer) {
 
