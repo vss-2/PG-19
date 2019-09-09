@@ -40,14 +40,18 @@ public:
 
     void look_at(const vec3 &from, const vec3 &at, const vec3 &up)
     {
+        axisZ = from - at;
+        axisZ.make_unit_vector();
+        axisY = up - (dot(up, axisZ)/ dot(axisZ, axisZ))*axisZ;
+        axisX = cross(axisY, axisZ);
+        
         camToWorld = matrix44(
             axisX.x(), axisX.y(), axisX.z(), 0.0,
             axisY.x(), axisY.y(), axisY.z(), 0.0,
             axisZ.x(), axisZ.y(), axisZ.z(), 0.0,
              from.x(),  from.y(),  from.z(), 1.0
         );
-
-        //matrix44 matrizWorldToCamera = camToWorld.inverse;
+        worldToCamera = camToWorld.inverse();
     }
 
     bool compute_pixel_coordinates(const vec3 &pWorld, vec2 &pRaster) 
@@ -55,6 +59,7 @@ public:
         //Converter pWorld para plano da câmera para o plano da câmera,
         //fazer mudança de base, e vai ficar x y z.
         //Jogar fora o 1 pq vec3 só aceita 3 parâmetros.
+        
         return false; 
         // Retornar verdadeiro se o ponto pode ser visto
     }
