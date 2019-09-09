@@ -44,10 +44,10 @@ public:
             axisX.x(), axisX.y(), axisX.z(), 0.0,
             axisY.x(), axisY.y(), axisY.z(), 0.0,
             axisZ.x(), axisZ.y(), axisZ.z(), 0.0,
-               from.x,    from.y,    from.z, 1.0
+             from.x(),  from.y(),  from.z(), 1.0
         );
 
-        matrix44 matrizWorldToCamera = camToWorld.inverse;
+        //matrix44 matrizWorldToCamera = camToWorld.inverse;
     }
 
     bool compute_pixel_coordinates(const vec3 &pWorld, vec2 &pRaster) 
