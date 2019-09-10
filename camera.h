@@ -37,6 +37,10 @@ public:
            {
                float radfov = fov*(3,141592f/180.f);
                 top = tan(radfov/2);
+                bottom = -top;
+                aspectRatio = windowWidth/windowHeight;
+                right = tan(radfov/2)*aspectRatio;
+                left = -right;
                 
                 look_at(from, at, up);
            }
@@ -59,7 +63,7 @@ public:
         worldToCamera = camToWorld.inverse();
     }
 
-    bool compute_pixel_coordinates(const vec3 &pWorld, vec2 &pRaster) 
+    bool compute_pixel_coordinates(const vec3 &pWorld, vec2 &praster) 
     { 
         vec3 algo, algo2;
 
@@ -76,10 +80,18 @@ public:
             algo.y()*(_near/algo.z()),
             _near)
         );
-        
+
         multi.mult_point_matrix(mProjecao, algo2);
         
-        return false; 
+        praster = (1 + algo2.x)/2*imgWidth, (1 + algo2.y)/2*imgHeight;
+
+        if((bottom <= algo.y() <= up) && (left <= algo.x() <= right))
+        {
+            return true;
+        } else {
+            return false; 
+        }
+
         // Retornar verdadeiro se o ponto pode ser visto
     }
 
