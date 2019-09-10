@@ -35,6 +35,9 @@ public:
            fov(f), _near(n), _far(a), imgWidth(iwidth), imgHeight(iheight),
 		   _from(from), _at(at), _up(up)
            {
+               float radfov = fov*(3,141592f/180.f);
+                top = tan(radfov/2);
+                
                 look_at(from, at, up);
            }
 
@@ -44,6 +47,8 @@ public:
         axisZ.make_unit_vector();
         axisY = up - (dot(up, axisZ)/ dot(axisZ, axisZ))*axisZ;
         axisX = cross(axisY, axisZ);
+        axisY.make_unit_vector();
+        axisX.make_unit_vector();
         
         camToWorld = matrix44(
             axisX.x(), axisX.y(), axisX.z(), 0.0,
@@ -56,9 +61,23 @@ public:
 
     bool compute_pixel_coordinates(const vec3 &pWorld, vec2 &pRaster) 
     { 
-        //Converter pWorld para plano da câmera para o plano da câmera,
-        //fazer mudança de base, e vai ficar x y z.
-        //Jogar fora o 1 pq vec3 só aceita 3 parâmetros.
+        vec3 algo, algo2;
+
+        matrix44 multi = matrix44(
+            2*_near/(right - left), 0.0      , 0.0      , 0.0,
+            0.0      , 2*_near/(bottom - top), 0.0      , 0.0,
+            -((righ + left)/(right - left)), -((bottom + top)/(bottom - top)), (far + near)/(far - near)), 1.0,
+            0.0      ,0.0       , -((2*_near)/(far - _near)), 0.0
+        );
+
+        worldToCamera.mult_point_matrix(pWorld,algo);
+        vec3 mProjecao = vec3(
+            algo.x()*(_near/algo.z()),
+            algo.y()*(_near/algo.z()),
+            _near)
+        );
+        
+        multi.mult_point_matrix(mProjecao, algo2);
         
         return false; 
         // Retornar verdadeiro se o ponto pode ser visto
