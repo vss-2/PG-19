@@ -21,7 +21,7 @@ public:
     int imgWidth, imgHeight;
     int windowWidth, windowHeight;
     float fov, _far, _near;
-    float bottom, left, top, right;
+    float bottom, left, top, right, aspectRatio;
     matrix44 camToWorld;
     matrix44 worldToCamera;
 
@@ -36,11 +36,11 @@ public:
            fov(f), _near(n), _far(a), imgWidth(iwidth), imgHeight(iheight),
 		   _from(from), _at(at), _up(up)
            {
-               float radfov = fov*(3,141592/180.f);
-                top = tan(radfov/2);
+                float radfov = fov*(3.141592f/180.f);
+                top = std::tan(radfov/2.f);
                 bottom = -top;
-                float aspectRatio = windowWidth/windowHeight;
-                right = tan(radfov/2)*aspectRatio;
+                aspectRatio = windowWidth/windowHeight;
+                right = std::tan(radfov/2.f)*aspectRatio;
                 left = -right;
                 
                 look_at(from, at, up);
@@ -51,8 +51,8 @@ public:
         axisZ = from - at;
         axisZ.make_unit_vector();
         axisY = up - (dot(up, axisZ)/ dot(axisZ, axisZ))*axisZ;
-        axisX = cross(axisY, axisZ);
         axisY.make_unit_vector();
+        axisX = cross(axisY, axisZ);
         axisX.make_unit_vector();
         
         camToWorld = matrix44(
@@ -71,8 +71,8 @@ public:
         matrix44 multi = matrix44(
             2*_near/(right - left), 0.0      , 0.0      , 0.0,
             0.0      , 2*_near/(bottom - top), 0.0      , 0.0,
-            -((right + left)/(right - left)), -((bottom + top)/(bottom - top)), ((_far + _near)/(_far - _near)), 1.0,
-            0.0      ,0.0       , -((2*_near)/(_far - _near)), 0.0
+            -(right + left)/(right - left), -(bottom + top)/(bottom - top), (_far + _near)/(_far - _near), 1.0,
+            0.0     ,     0.0, -(2*_near)/(_far - _near), 0.0
         );
 
         worldToCamera.mult_point_matrix(pWorld,algo);
@@ -84,7 +84,7 @@ public:
 
         multi.mult_point_matrix(mProjecao, algo2);
         
-        praster = vec2((1+algo2.x()/2*imgWidth), (1+algo2.y())/2*imgHeight);
+        praster = vec2((1+algo2.x())/2*imgWidth, (1-algo2.y())/2*imgHeight);
 
         if((bottom <= algo.y() <= top) && (left <= algo.x() <= right))
         {
