@@ -19,6 +19,7 @@ class camera
 {
 public:
     int imgWidth, imgHeight;
+    int windowWidth, windowHeight;
     float fov, _far, _near;
     float bottom, left, top, right;
     matrix44 camToWorld;
@@ -35,10 +36,10 @@ public:
            fov(f), _near(n), _far(a), imgWidth(iwidth), imgHeight(iheight),
 		   _from(from), _at(at), _up(up)
            {
-               float radfov = fov*(3,141592f/180.f);
+               float radfov = fov*(3,141592/180.f);
                 top = tan(radfov/2);
                 bottom = -top;
-                aspectRatio = windowWidth/windowHeight;
+                float aspectRatio = windowWidth/windowHeight;
                 right = tan(radfov/2)*aspectRatio;
                 left = -right;
                 
@@ -70,22 +71,22 @@ public:
         matrix44 multi = matrix44(
             2*_near/(right - left), 0.0      , 0.0      , 0.0,
             0.0      , 2*_near/(bottom - top), 0.0      , 0.0,
-            -((righ + left)/(right - left)), -((bottom + top)/(bottom - top)), (far + near)/(far - near)), 1.0,
-            0.0      ,0.0       , -((2*_near)/(far - _near)), 0.0
+            -((right + left)/(right - left)), -((bottom + top)/(bottom - top)), ((_far + _near)/(_far - _near)), 1.0,
+            0.0      ,0.0       , -((2*_near)/(_far - _near)), 0.0
         );
 
         worldToCamera.mult_point_matrix(pWorld,algo);
         vec3 mProjecao = vec3(
             algo.x()*(_near/algo.z()),
             algo.y()*(_near/algo.z()),
-            _near)
+            _near
         );
 
         multi.mult_point_matrix(mProjecao, algo2);
         
-        praster = (1 + algo2.x)/2*imgWidth, (1 + algo2.y)/2*imgHeight;
+        praster = vec2((1+algo2.x()/2*imgWidth), (1+algo2.y())/2*imgHeight);
 
-        if((bottom <= algo.y() <= up) && (left <= algo.x() <= right))
+        if((bottom <= algo.y() <= top) && (left <= algo.x() <= right))
         {
             return true;
         } else {
