@@ -89,8 +89,6 @@ public:
 
 		praster = vec2((1 + algo2.x()) / 2 * imgWidth, (1 - algo2.y()) / 2 * imgHeight);
 
-		printf("x: %f\ny: %f\n", praster.x(), praster.y());
-
 		if ((bottom <= algo.y() && algo.y() <= top) && (left <= algo.x() && algo.x() <= right)) {
 			return true;
 
