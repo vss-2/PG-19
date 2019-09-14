@@ -42,8 +42,6 @@ public:
 		left = -right;
 
 		look_at(from, at, up);
-
-
 	}
 
 
@@ -89,6 +87,8 @@ public:
 
 		praster = vec2((1 + algo2.x()) / 2 * imgWidth, (1 - algo2.y()) / 2 * imgHeight);
 
+		//printf("x: %f\ny: %f\n", praster.x(), praster.y());
+
 		if ((bottom <= algo.y() && algo.y() <= top) && (left <= algo.x() && algo.x() <= right)) {
 			return true;
 
@@ -96,23 +96,31 @@ public:
 		else {
 
 			return false;
-
+			//calcula a cos(de algo), se der positivo, da false
 		}
 
 	}
 
 	void render_scene(std::vector<Obj> objs, SDL_Renderer* renderer) {
 
+		int PosX = 0;
+		int PosY = 0;
+		int PosZ = 4;
 		vec3 light(0.0f, 0.0f, -1.0f);
 		light.make_unit_vector();
+		int aa = 0;
+
+
 
 		for (auto obj : objs) {
 			for (int i = 0; i < obj.mesh.tris.size(); i++)
 			{
+				aa++;
+				//printf("%d\n", aa);
 				vec2 praster1;
 				vec2 praster2;
 				vec2 praster3;
-
+				//printf("%d\n",aa);
 				vec3 col(255, 255, 255);
 				SDL_SetRenderDrawColor(renderer, 255, 255, 255, SDL_ALPHA_OPAQUE);
 
@@ -127,6 +135,7 @@ public:
 					SDL_RenderDrawLine(renderer, praster1.x(), praster1.y(), praster3.x(), praster3.y());
 				if (v2 && v3)
 					SDL_RenderDrawLine(renderer, praster2.x(), praster2.y(), praster3.x(), praster3.y());
+				
 			}
 		}
 	}

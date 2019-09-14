@@ -1,10 +1,10 @@
-
 #include <string>
 #include <math.h>
 #include "camera.h" 
 
 #include "ImGUI/imgui_sdl.h"
 #include "ImGUI/imgui.h"
+
 
 
 int main(int argc, char* argv[])
@@ -15,6 +15,9 @@ int main(int argc, char* argv[])
 		SDL_Renderer* renderer = SDL_CreateRenderer(window, -1, SDL_RENDERER_ACCELERATED);
 
 		if (window && renderer) {
+			int PosX = 0;
+			int PosY = 0;
+			int PosZ = 4;
 			SDL_bool done = SDL_FALSE;
 			SDL_SetRelativeMouseMode(SDL_FALSE);
 
@@ -24,7 +27,7 @@ int main(int argc, char* argv[])
 			ImGui::CreateContext();
 			ImGuiSDL::Initialize(renderer, WIDTH, HEIGHT);
 
-			camera cam(vec3(0, 0, 5), vec3(0, 0, -1), vec3(0, 1, 0), 90.0f, 1.f, WIDTH, HEIGHT, 1000);
+			camera cam(vec3(PosX, PosY, PosZ), vec3(0, 0, -1), vec3(0, 1, 0), 90.0f, 1.f, WIDTH, HEIGHT, 1000);
 
 			float my_color[4];
 			bool my_tool_active;
@@ -65,9 +68,9 @@ int main(int argc, char* argv[])
 				ImGui::PlotLines("Frame Times", my_values, IM_ARRAYSIZE(my_values));
 
 				// Display contents in a scrolling region
-				ImGui::TextColored(ImVec4(1, 1, 0, 1), "Important Stuff");
+				ImGui::TextColored(ImVec4(1, 1, 0, 1), "Pojeto di PeGue");
 				ImGui::BeginChild("Scrolling");
-				ImGui::Text("Random Message\n");
+				ImGui::Text("Vo mata o Krushtu\n");
 				ImGui::EndChild();
 				ImGui::End();
 
@@ -80,12 +83,38 @@ int main(int argc, char* argv[])
 				ImGuiSDL::Render(ImGui::GetDrawData());
 				SDL_RenderPresent(renderer); // present the generated triangle data onto screen
 
+				
 				while (SDL_PollEvent(&event)) {
 
 					if (event.type == SDL_KEYDOWN) {
-						if (event.key.keysym.sym == SDLK_a)
+						if (event.key.keysym.sym == SDLK_a) {
+							PosX++;
 							printf("Just pressed keyboard key A!\n");
+							cam.look_at(vec3(PosX, PosY, PosZ), vec3(0, 0, -1), vec3(0, 1, 0));
+						}
 					}
+					if (event.type == SDL_KEYDOWN) {
+						if (event.key.keysym.sym == SDLK_w) {
+							PosZ--;
+							printf("Just pressed keyboard key W!\n");
+							cam.look_at(vec3(PosX, PosY, PosZ), vec3(0, 0, -1), vec3(0, 1, 0));
+						}
+					}
+					if (event.type == SDL_KEYDOWN) {
+						if (event.key.keysym.sym == SDLK_s) {
+							PosZ++;
+							printf("Just pressed keyboard key S!\n");
+							cam.look_at(vec3(PosX, PosY, PosZ), vec3(0, 0, -1), vec3(0, 1, 0));
+						}
+					}
+					if (event.type == SDL_KEYDOWN) {
+						if (event.key.keysym.sym == SDLK_d) {
+							PosX--;
+							printf("Just pressed keyboard key D!\n");
+							cam.look_at(vec3(PosX, PosY, PosZ), vec3(0, 0, -1), vec3(0, 1, 0));
+						}
+					}
+
 
 					// mouse pressed event
 					if (event.type == SDL_MOUSEBUTTONDOWN)
