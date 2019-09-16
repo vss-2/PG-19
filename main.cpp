@@ -11,7 +11,7 @@ int main(int argc, char* argv[])
 {
 	if (SDL_Init(SDL_INIT_EVERYTHING) == 0) {
 
-		SDL_Window* window = SDL_CreateWindow("Projeto PG - Grupo X", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, WIDTH, HEIGHT, SDL_WINDOW_ALLOW_HIGHDPI);
+		SDL_Window* window = SDL_CreateWindow("Projeto PG - Grupo 3", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, WIDTH, HEIGHT, SDL_WINDOW_ALLOW_HIGHDPI);
 		SDL_Renderer* renderer = SDL_CreateRenderer(window, -1, SDL_RENDERER_ACCELERATED);
 
 		if (window && renderer) {
