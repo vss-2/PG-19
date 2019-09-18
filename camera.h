@@ -7,8 +7,9 @@
 #include "object.h"
 
 #ifdef _WIN32 || WIN32
-#include <SDL.h>
+	#include <SDL.h>
 #elif defined(__unix__)
+	#include <SDL2/SDL.h>
 #endif
 
 const int WIDTH = 600;
