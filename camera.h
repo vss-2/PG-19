@@ -88,8 +88,6 @@ public:
 
 		praster = vec2((1 + algo2.x()) / 2 * imgWidth, (1 - algo2.y()) / 2 * imgHeight);
 
-		//printf("x: %f\ny: %f\n", praster.x(), praster.y());
-
 		if ((bottom <= algo.y() && algo.y() <= top) && (left <= algo.x() && algo.x() <= right)) {
 			return true;
 
@@ -102,6 +100,45 @@ public:
 
 	}
 
+	void desenharLinha(SDL_Renderer *vemDoMain, vec2 &ponto1, vec2 &ponto2){
+		vec2 diretor = ponto1-ponto2;
+		int fInt = (int) diretor.length();
+		diretor.make_unit_vector();
+
+		for(int iter = 0; iter < fInt; iter++){
+			SDL_RenderDrawPoint(vemDoMain, ponto2.x(), ponto2.y());
+			
+			ponto2 += diretor;
+		}
+		
+		
+	}
+	int getOutcode(vec2 p, int xMin, int xMax, int yMin, int yMax){
+		int inside = 0;
+		int left   = 1;
+		int right  = 2;
+		int bottom = 4;
+		int top    = 8;
+		
+		if(p.y() > yMax){
+			inside = top    |= inside;
+		}
+		if(p.y() < yMin){
+			inside = bottom |= inside;
+		}
+		if(p.x() > xMax){
+			inside = right  |= inside;
+		}
+		if(p.x() < xMin){
+			inside = left   |= inside;
+		} 
+		return inside;
+	} 
+	bool ClipLine(vec2 &p0, vec2 &p1){
+		
+	}
+
+
 	void render_scene(std::vector<Obj> objs, SDL_Renderer* renderer) {
 
 		int PosX = 0;
@@ -111,9 +148,8 @@ public:
 		light.make_unit_vector();
 		int aa = 0;
 
-
-
-		for (auto obj : objs) {
+		for (auto obj : objs) 
+		{
 			for (int i = 0; i < obj.mesh.tris.size(); i++)
 			{
 				aa++;
@@ -131,11 +167,11 @@ public:
 				v3 = compute_pixel_coordinates(obj.mesh.tris[i].vertex[2].pos, praster3);
 
 				if (v1 && v2)
-					SDL_RenderDrawLine(renderer, praster1.x(), praster1.y(), praster2.x(), praster2.y());
+					desenharLinha(renderer, praster1, praster2);
 				if (v1 && v3)
-					SDL_RenderDrawLine(renderer, praster1.x(), praster1.y(), praster3.x(), praster3.y());
+					desenharLinha(renderer, praster1, praster3);
 				if (v2 && v3)
-					SDL_RenderDrawLine(renderer, praster2.x(), praster2.y(), praster3.x(), praster3.y());
+					desenharLinha(renderer, praster2, praster3);
 				
 			}
 		}
