@@ -107,12 +107,12 @@ public:
 
 		for(int iter = 0; iter < fInt; iter++){
 			SDL_RenderDrawPoint(vemDoMain, ponto2.x(), ponto2.y());
-			
 			ponto2 += diretor;
 		}
 		
 		
 	}
+
 	int getOutcode(vec2 p, int xMin, int xMax, int yMin, int yMax){
 		int inside = 0;
 		int left   = 1;
@@ -131,11 +131,52 @@ public:
 		}
 		if(p.x() < xMin){
 			inside = left   |= inside;
-		} 
+		}
 		return inside;
-	} 
-	bool ClipLine(vec2 &p0, vec2 &p1){
+	}
+
+	bool ClipLine(vec2 &p0, vec2 &p1, int xMin, int xMax, int yMin, int yMax){
+		int outcode0 = getOutcode(p0, xMin, xMax, yMin, yMax);
+		int outcode1 = getOutcode(p1, xMin, xMax, yMin, yMax);
 		
+		float slope = (p1.y() - p0.y())/(p1.x() - p0.x());
+		float novoX, novoY = 0;
+
+		bool accept = false;
+
+		while(true){
+			if(outcode0 == 0 and outcode1 == 0){
+				accept = true;
+				break;
+			} else if (outcode0 and outcode1){
+				break;
+			} else {
+				// Pelo menos um ponto está fora da janela
+				int outcodeOutside = outcode1 != 0? outcode1 : outcode0;
+				// Calcula x e y para interseção com top, bottom, right e left
+				if (outcodeOutside and top){
+					novoX = p0.x() + (1.0/slope)*(xMax - p0.x());
+					novoY = p0.y() + slope*(yMax - p0.y());
+				} else if (outcodeOutside and bottom){
+					novoX = p0.x() + (1.0/slope)*(xMax - p0.x());
+					novoY = p0.y() + slope*(yMin - p0.y());
+				} else if (outcodeOutside and right){
+					novoX = p0.x() + (1.0/slope)*(xMax - p0.x());
+					novoY = p0.y() + slope*(yMax - p0.y());
+				} else if (outcodeOutside and left){
+					novoX = p0.x() + (1.0/slope)*(xMin - p0.x());
+					novoY = p0.y() + slope*(yMax - p0.y());
+				}
+				if (outcodeOutside == outcode0){
+					
+					outcode0 = getOutcode(p0, xMin, xMax, yMin, yMax);
+				} else {
+
+					outcode1 = getOutcode(p1, xMin, xMax, yMin, yMax);
+				}
+			}
+		}
+		return accept;
 	}
 
 
