@@ -174,8 +174,8 @@ public:
 
 	bool ClipLine(vec2 &bkprasterA, vec2 &bkprasterB, int xMin, int xMax, int yMin, int yMax)
 	{
-		int outcode0 = getOutcode(bkprasterA, -1, 801, -1, 601);
-		int outcode1 = getOutcode(bkprasterB, -1, 801, -1, 601);
+		int outcode0 = getOutcode(bkprasterA, xMin, xMax, yMin, yMax);
+		int outcode1 = getOutcode(bkprasterB, xMin, xMax, yMin, yMax);
 		
 		float slope, novoX, novoY = 0;
 
@@ -224,7 +224,7 @@ public:
 				}
                     
 				//printf("Slope: %f, novoX: %f, novoY: %f", slope, novoX, novoY);
-
+				printf("OutcodeOutside:%i\nOutcode0:%i\nOutcode1:%i\n", outcodeOutside, outcode0, outcode1);
 				if (outcodeOutside == outcode0)
 				{
 					printf("Outcode0 é igual\n");
@@ -237,6 +237,7 @@ public:
                     bkprasterB[1] = novoY;
                     //printf("Slope: %f, novoX: %f, novoY: %f",slope ,novoX, novoY);
 					outcode1 = getOutcode(bkprasterB, xMin, xMax, yMin, yMax);
+					printf("Atualizei outcode1: %i\n", outcode1);
 				}
 			}
 		}
