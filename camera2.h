@@ -95,7 +95,7 @@ public:
 		else 
 		{
 			return false;
-			//calcula a cos(de algo), se der positivo, da false
+			// calcula a cos(de algo), se der positivo, da false
 		}
 	}
 
@@ -142,22 +142,22 @@ public:
 		}
 
 		if(p.y() > yMax && p.x() > xMax)
-		{	//Top-Right
+		{	// Top-Right
 			bits = top    | right;
 		}
 
 		if(p.y() < yMin && p.x() < xMin)
-		{	//Bottom-Left
+		{	// Bottom-Left
 			bits = bottom | left;
 		}
 
 		if(p.x() > xMax && p.y() < yMin)
-		{	//Bottom-Right
+		{	// Bottom-Right
 			bits = right  | right;
 		}
 
 		if(p.x() < xMin && p.y() > yMax)
-		{	//Top-Left
+		{	// Top-Left
 			bits = left   | top;
 		}
 
@@ -166,8 +166,8 @@ public:
 		// 	bits = inside;
 		// }
 
-		//if(bits != 0)
-			//printf("O bits retornou: %i\n", bits);
+		// if(bits != 0)
+			// printf("O bits retornou: %i\n", bits);
 
 		return bits;
 	}
@@ -223,20 +223,23 @@ public:
 					printf("Entrei no LFT\n");
 				}
                     
-				//printf("Slope: %f, novoX: %f, novoY: %f", slope, novoX, novoY);
+				// printf("Slope: %f, novoX: %f, novoY: %f", slope, novoX, novoY);
 				printf("OutcodeOutside:%i\nOutcode0:%i\nOutcode1:%i\n", outcodeOutside, outcode0, outcode1);
 				if (outcodeOutside == outcode0)
 				{
 					printf("Outcode0 é igual\n");
                     bkprasterA[0] = novoX;
                     bkprasterA[1] = novoY;
-					outcode0 = getOutcode(bkprasterA, xMin, xMax, yMin, yMax);
+					outcode0 = getOutcode(bkprasterB, xMin, xMax, yMin, yMax);
+					// outcode0 = 1;
+					// outcode1 = 1;
 				} else {
-					printf("Outcode 0 é diferente\n");
                     bkprasterB[0] = novoX;
                     bkprasterB[1] = novoY;
-                    //printf("Slope: %f, novoX: %f, novoY: %f",slope ,novoX, novoY);
-					outcode1 = getOutcode(bkprasterB, xMin, xMax, yMin, yMax);
+                    // printf("Slope: %f, novoX: %f, novoY: %f",slope ,novoX, novoY);
+					outcode1 = getOutcode(bkprasterA, xMin, xMax, yMin, yMax);
+					// outcode0 = 1;
+					// outcode1 = 1;
 					printf("Atualizei outcode1: %i\n", outcode1);
 				}
 			}
