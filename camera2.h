@@ -92,7 +92,8 @@ public:
 		{
 			return true;
 		}
-		else {
+		else 
+		{
 			return false;
 			//calcula a cos(de algo), se der positivo, da false
 		}
@@ -142,10 +143,10 @@ public:
 		return bits;
 	}
 
-	bool ClipLine(vec2 &p0, vec2 &p1, int xMin, int xMax, int yMin, int yMax)
+	bool ClipLine(vec2 &bkprasterA, vec2 &bkprasterB, int xMin, int xMax, int yMin, int yMax)
 	{
-		int outcode0 = getOutcode(p0, xMin, xMax, yMin, yMax);
-		int outcode1 = getOutcode(p1, xMin, xMax, yMin, yMax);
+		int outcode0 = getOutcode(bkprasterA, xMin, xMax, yMin, yMax);
+		int outcode1 = getOutcode(bkprasterB, xMin, xMax, yMin, yMax);
 		
 		float slope, novoX, novoY = 0;
 
@@ -156,7 +157,8 @@ public:
 			{
 				accept = true;
 				break;
-			} else if (outcode0 & outcode1)
+			} 
+			else if (outcode0 & outcode1)
 			{
 				break;
 			} else {
@@ -187,15 +189,15 @@ public:
 
 				if (outcodeOutside == outcode0)
 				{
-                    p0[0] = novoX;
-                    p0[1] = novoY;
+                    bkprasterA[0] = novoX;
+                    bkprasterA[1] = novoY;
                     printf("Slope: %f, novoX: %f, novoY: %f",slope ,novoX, novoY);
-					outcode0 = getOutcode(p0, xMin, xMax, yMin, yMax);
+					outcode0 = getOutcode(bkprasterA, xMin, xMax, yMin, yMax);
 				} else {
-                    p1[0] = novoX;
-                    p1[1] = novoY;
+                    bkprasterB[0] = novoX;
+                    bkprasterB[1] = novoY;
                     printf("Slope: %f, novoX: %f, novoY: %f",slope ,novoX, novoY);
-					outcode1 = getOutcode(p1, xMin, xMax, yMin, yMax);
+					outcode1 = getOutcode(bkprasterB, xMin, xMax, yMin, yMax);
 				}
 			}
 		}
@@ -216,7 +218,7 @@ public:
 			for (int i = 0; i < obj.mesh.tris.size(); i++)
 			{
 				vec2 praster1, praster2, praster3;
-				vec2 bkpraster1, bkpraster2, bkpraster3;
+				vec2 bkprasterA, bkprasterB;
 
 				vec3 col(255, 255, 255);
 				SDL_SetRenderDrawColor(renderer, 255, 255, 255, SDL_ALPHA_OPAQUE);
@@ -226,31 +228,33 @@ public:
 				v2 = compute_pixel_coordinates(obj.mesh.tris[i].vertex[1].pos, praster2);
 				v3 = compute_pixel_coordinates(obj.mesh.tris[i].vertex[2].pos, praster3);
 
-				bkpraster1 = praster1;
-				bkpraster2 = praster2;
-				bkpraster3 = praster3;
-
 				if (v1 && v2)
                 {
-                    if(ClipLine(bkpraster1, bkpraster2, 0, WIDTH, 0, HEIGHT))
+					bkprasterA = praster1;
+					bkprasterB = praster2;
+                    if(ClipLine(bkprasterA, bkprasterB, 0, WIDTH, 0, HEIGHT))
                     {
-                    	desenharLinha(renderer, bkpraster1, bkpraster2);
+                    	desenharLinha(renderer, bkprasterA, bkprasterB);
                     }
                 }
 
 				if (v1 && v3)
                 {
-                    if(ClipLine(bkpraster1, bkpraster3, 0, WIDTH, 0, HEIGHT))
+					bkprasterA = praster1;
+					bkprasterB = praster3;
+                    if(ClipLine(bkprasterA, bkprasterB, 0, WIDTH, 0, HEIGHT))
                     {
-                    	desenharLinha(renderer, bkpraster1, bkpraster3);
+                    	desenharLinha(renderer, bkprasterA, bkprasterB);
                     }
                 }
 
 				if (v2 && v3)
                 {
-                    if(ClipLine(bkpraster2, bkpraster3, 0, WIDTH, 0, HEIGHT))
+					bkprasterA = praster2;
+					bkprasterB = praster3;
+                    if(ClipLine(bkprasterA, bkprasterB, 0, WIDTH, 0, HEIGHT))
                     {
-                    	desenharLinha(renderer, bkpraster2, bkpraster3);
+                    	desenharLinha(renderer, bkprasterA, bkprasterB);
                     }                    
                 }
 			}
