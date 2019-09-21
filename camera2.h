@@ -166,8 +166,8 @@ public:
 		// 	bits = inside;
 		// }
 
-		if(bits != 0)
-			printf("O bits retornou: %i\n", bits);
+		//if(bits != 0)
+			//printf("O bits retornou: %i\n", bits);
 
 		return bits;
 	}
