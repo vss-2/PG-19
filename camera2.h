@@ -115,6 +115,7 @@ public:
 
 	int getOutcode(vec2 p, int xMin, int xMax, int yMin, int yMax){
 		int bits   = 0;
+		int inside = 0;
 		int left   = 1;
 		int right  = 2;
 		int bottom = 4;
@@ -122,31 +123,59 @@ public:
 		
 		if(p.y() > yMax)
 		{
-			bits &= top;
+			bits = top    | inside;
 		}
 
 		if(p.y() < yMin)
 		{
-			bits &= bottom;
+			bits = bottom | inside;
 		}
 
 		if(p.x() > xMax)
 		{
-			bits &= right;
+			bits = right  | inside;
 		}
 
 		if(p.x() < xMin)
 		{
-			bits &= left;
+			bits = left   | inside;
 		}
+
+		if(p.y() > yMax && p.x() > xMax)
+		{	//Top-Right
+			bits = top    | right;
+		}
+
+		if(p.y() < yMin && p.x() < xMin)
+		{	//Bottom-Left
+			bits = bottom | left;
+		}
+
+		if(p.x() > xMax && p.y() < yMin)
+		{	//Bottom-Right
+			bits = right  | right;
+		}
+
+		if(p.x() < xMin && p.y() > yMax)
+		{	//Top-Left
+			bits = left   | top;
+		}
+
+		// if((xMin < p.x() < xMax) and (yMin < p.y() < yMax))
+		// {	// Inside
+		// 	bits = inside;
+		// }
+
+		if(bits != 0)
+			printf("O bits retornou: %i\n", bits);
 
 		return bits;
 	}
 
 	bool ClipLine(vec2 &bkprasterA, vec2 &bkprasterB, int xMin, int xMax, int yMin, int yMax)
 	{
-		int outcode0 = getOutcode(bkprasterA, xMin, xMax, yMin, yMax);
-		int outcode1 = getOutcode(bkprasterB, xMin, xMax, yMin, yMax);
+		int outcode0 = getOutcode(bkprasterA, -1, 801, -1, 601);
+		int outcode1 = getOutcode(bkprasterB, -1, 801, -1, 601);
 		
 		float slope, novoX, novoY = 0;
 
@@ -163,47 +192,56 @@ public:
 				break;
 			} else {
 				// Pelo menos um ponto está fora da janela
+
 				int outcodeOutside = outcode1 != 0? outcode1 : outcode0;
+				// printf("O outcodeOutside é: %i\n", outcodeOutside);
+
 				// Calcula x e y para interseção com top, bottom, right e left
 				if (outcodeOutside & 8)
 				{
-                    //slope = (p1.y() - p0.y())/(p1.x() - p0.x());
-					//novoX = p0.x() + (1.0f/slope)*(yMax - p0.y());
+                    slope = (bkprasterB.y() - bkprasterA.y())/(bkprasterB.x() - bkprasterA.x());
+					novoX = bkprasterA.x() + (1.0f/slope)*(yMax - bkprasterA.y());
 					novoY = yMax;
+					printf("Entrei no TOP\n");
 				} else if (outcodeOutside & 4)
 				{
-                    //slope = (p1.y() - p0.y())/(p1.x() - p0.x());
-					//novoX = p0.x() + (1.0f/slope)*(yMin - p0.y());
+                    slope = (bkprasterB.y() - bkprasterA.y())/(bkprasterB.x() - bkprasterA.x());
+					novoX = bkprasterA.x() + (1.0f/slope)*(yMin - bkprasterA.y());
 					novoY = yMin;
+					printf("Entrei no BOT\n");
 				} else if (outcodeOutside & 2)
 				{
-                    //slope = (p1.y() - p0.y())/(p1.x() - p0.x());
-					novoX = xMax;
-					//novoY = p0.y() + slope*(xMax - p0.x());
+                    slope = (bkprasterB.y() - bkprasterA.y())/(bkprasterB.x() - bkprasterA.x());
+					novoY = bkprasterA.y() + slope*(xMax - bkprasterA.x());
+					novoX = xMax; 
+					printf("Entrei no RGT\n");
 				} else if (outcodeOutside & 1)
 				{
-                    //slope = (p1.y() - p0.y())/(p1.x() - p0.x());
+                    slope = (bkprasterB.y() - bkprasterA.y())/(bkprasterB.x() - bkprasterA.x());
+					novoY = bkprasterA.y() + slope*(xMin - bkprasterA.x());
 					novoX = xMin;
-					//novoY = p0.y() + slope*(xMin - p0.x());
+					printf("Entrei no LFT\n");
 				}
+                    
+				//printf("Slope: %f, novoX: %f, novoY: %f", slope, novoX, novoY);
 
 				if (outcodeOutside == outcode0)
 				{
+					printf("Outcode0 é igual\n");
                     bkprasterA[0] = novoX;
                     bkprasterA[1] = novoY;
-                    printf("Slope: %f, novoX: %f, novoY: %f",slope ,novoX, novoY);
 					outcode0 = getOutcode(bkprasterA, xMin, xMax, yMin, yMax);
 				} else {
+					printf("Outcode 0 é diferente\n");
                     bkprasterB[0] = novoX;
                     bkprasterB[1] = novoY;
-                    printf("Slope: %f, novoX: %f, novoY: %f",slope ,novoX, novoY);
+                    //printf("Slope: %f, novoX: %f, novoY: %f",slope ,novoX, novoY);
 					outcode1 = getOutcode(bkprasterB, xMin, xMax, yMin, yMax);
 				}
 			}
 		}
 		return accept;
 	}
-
 
 	void render_scene(std::vector<Obj> objs, SDL_Renderer* renderer){
 		int PosX = 0;
