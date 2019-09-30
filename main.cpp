@@ -128,7 +128,53 @@ int main(int argc, char* argv[])
 							//Relative mouse mode moves mouse to center of window
 							//every frame. Useful if you want to use mouse and not worry
 							//about it going off screen
-							SDL_SetRelativeMouseMode(SDL_TRUE);
+							int mousePosX, mousePosY;
+							SDL_GetMouseState(&mousePosX, &mousePosY);
+							float Px = mousePosX/1.0;
+							float Py = mousePosY/1.0;
+							//SDL_SetRelativeMouseMode(SDL_TRUE);
+							float Px = -(2 * (Px/imgWidth) - 1) * cam.right/cam._near;
+							float Py = (1 - 2*(Py/imgHeight)) * cam.top/cam._near;
+							vec3 RayDirection = vec3(Px, Py, -1);
+							
+							vec3 RDWorld;
+
+							cam.worldToCamera.mult_point_matrix(RayDirection, RDWorld);
+							
+							RDWorld.make_unit_vector();
+
+							for (auto object : objs) 
+							{ // Se não rodar com object, trocar por obj
+								for (int i = 0; i < object.mesh.tris.size(); i++)
+								{
+									vec3 p1 = obj.mesh.tris[i].vertex[0].pos;
+									vec3 p2 = obj.mesh.tris[i].vertex[1].pos;
+									vec3 p3 = obj.mesh.tris[i].vertex[2].pos;
+
+									vec3 normTriag = (cross(p2-p1, p3-p1));
+
+									// Tomar CUIDADO com a ordem:
+									// a arbitrária é A 1,2 - B 1,3 - C 2,3
+									// Fazer p2-p1, p3-p1
+
+									float D = dot(normTriag, p1);
+									// D é o D do plano
+
+									// É o t do slide, que é a distância até o ponto:
+									float t = -(dot(normTriag, cam._from) - D)/dot(normTriag, RDWorld);
+
+									if(dot(normTriag, RDWorld) >= 0.00001 && t >= 0)
+									{
+										vec3 pInter;
+										pInter[0] = cam._from[0] + (t*RDWorld[0]);
+										pInter[1] = cam._from[1] + (t*RDWorld[1]);
+										pInter[2] = cam._from[2] + (t*RDWorld[2]);	
+									}
+
+									// Ver se os produtos vetorias com cross
+
+								}
+							}
 						}
 					}
 					if (event.type == SDL_MOUSEBUTTONUP)
