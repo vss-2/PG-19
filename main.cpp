@@ -17,12 +17,12 @@ bool insideoutsidetest(Triangle triangle, vec3 &P){
     vec3 cOut2 = cross(P - p2, p3 - p2);
     vec3 cOut3 = cross(P - p3, p1 - p3);
 
-    if((dot(cOut1, normTriag) > 0 && dot(cOut2, normTriag) > 0) && dot(cOut3, normTriag) > 0)
+    if((dot(cOut1, normTriag) < 0 && dot(cOut2, normTriag) < 0) && dot(cOut3, normTriag) < 0)
     {
 		printf("true\n");
         return true;
     }
-	printf("false\n");
+	// printf("false\n");
     return false;
 }
 

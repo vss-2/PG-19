@@ -204,32 +204,32 @@ public:
                     slope = (bkprasterB.y() - bkprasterA.y())/(bkprasterB.x() - bkprasterA.x());
 					novoX = bkprasterA.x() + (1.0f/slope)*(yMax - bkprasterA.y());
 					novoY = yMax;
-					printf("Entrei no TOP\n");
+					// printf("Entrei no TOP\n");
 				} else if (outcodeOutside & 4)
 				{
                     slope = (bkprasterB.y() - bkprasterA.y())/(bkprasterB.x() - bkprasterA.x());
 					novoX = bkprasterA.x() + (1.0f/slope)*(yMin - bkprasterA.y());
 					novoY = yMin;
-					printf("Entrei no BOT\n");
+					// printf("Entrei no BOT\n");
 				} else if (outcodeOutside & 2)
 				{
                     slope = (bkprasterB.y() - bkprasterA.y())/(bkprasterB.x() - bkprasterA.x());
 					novoY = bkprasterA.y() + slope*(xMax - bkprasterA.x());
 					novoX = xMax; 
-					printf("Entrei no RGT\n");
+					// printf("Entrei no RGT\n");
 				} else if (outcodeOutside & 1)
 				{
                     slope = (bkprasterB.y() - bkprasterA.y())/(bkprasterB.x() - bkprasterA.x());
 					novoY = bkprasterA.y() + slope*(xMin - bkprasterA.x());
 					novoX = xMin;
-					printf("Entrei no LFT\n");
+					// printf("Entrei no LFT\n");
 				}
                     
 				// printf("Slope: %f, novoX: %f, novoY: %f", slope, novoX, novoY);
-				printf("OutcodeOutside:%i\nOutcode0:%i\nOutcode1:%i\n", outcodeOutside, outcode0, outcode1);
+				// printf("OutcodeOutside:%i\nOutcode0:%i\nOutcode1:%i\n", outcodeOutside, outcode0, outcode1);
 				if (outcodeOutside == outcode0)
 				{
-					printf("Outcode0 é igual\n");
+					// printf("Outcode0 é igual\n");
                     bkprasterA[0] = novoX;
                     bkprasterA[1] = novoY;
 					outcode0 = getOutcode(bkprasterB, xMin, xMax, yMin, yMax);
@@ -242,7 +242,7 @@ public:
 					outcode1 = getOutcode(bkprasterA, xMin, xMax, yMin, yMax);
 					// outcode0 = 1;
 					// outcode1 = 1;
-					printf("Atualizei outcode1: %i\n", outcode1);
+					// printf("Atualizei outcode1: %i\n", outcode1);
 				}
 			}
 		}
