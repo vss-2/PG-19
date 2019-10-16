@@ -13,9 +13,9 @@ bool insideoutsidetest(Triangle triangle, vec3 &P){
 
     vec3 normTriag = (cross(p2-p1, p3-p1));  
     
-    vec3 cOut1 = cross(P - p1, p2 - p1);
-    vec3 cOut2 = cross(P - p2, p3 - p2);
-    vec3 cOut3 = cross(P - p3, p1 - p3);
+    vec3 cOut1 = -cross(P - p1, p2 - p1);
+    vec3 cOut2 = -cross(P - p2, p3 - p2);
+    vec3 cOut3 = -cross(P - p3, p1 - p3);
 
     if((dot(cOut1, normTriag) < 0 && dot(cOut2, normTriag) < 0) && dot(cOut3, normTriag) < 0)
     {
@@ -34,9 +34,7 @@ int main(int argc, char* argv[])
 		SDL_Renderer* renderer = SDL_CreateRenderer(window, -1, SDL_RENDERER_ACCELERATED);
 
 		if (window && renderer) {
-			int PosX = 0;
-			int PosY = 0;
-			int PosZ = 4;
+			vec3 Pos = vec3 (0,0,4);
 			SDL_bool done = SDL_FALSE;
 			SDL_SetRelativeMouseMode(SDL_FALSE);
 
@@ -46,7 +44,7 @@ int main(int argc, char* argv[])
 			ImGui::CreateContext();
 			ImGuiSDL::Initialize(renderer, WIDTH, HEIGHT);
 
-			camera cam(vec3(PosX, PosY, PosZ), vec3(0, 0, -1), vec3(0, 1, 0), 90.0f, 1.f, WIDTH, HEIGHT, 1000);
+			camera cam(Pos, vec3(0, 0, -1), vec3(0, 1, 0), 90.0f, 1.f, WIDTH, HEIGHT, 1000);
 
 			float my_color[4];
 			bool my_tool_active;
@@ -107,30 +105,30 @@ int main(int argc, char* argv[])
 
 					if (event.type == SDL_KEYDOWN) {
 						if (event.key.keysym.sym == SDLK_a) {
-							PosX++;
-							printf("Just pressed keyboard key A!\n");
-							cam.look_at(vec3(PosX, PosY, PosZ), vec3(0, 0, -1), vec3(0, 1, 0));
+							Pos += cam.axisX;
+							printf("A %f,%f,%f\n", Pos.x(), Pos.y(), Pos.z());
+							cam.look_at(Pos, vec3(0, 0, -1), vec3(0, 1, 0));
 						}
 					}
 					if (event.type == SDL_KEYDOWN) {
 						if (event.key.keysym.sym == SDLK_w) {
-							PosZ--;
-							printf("Just pressed keyboard key W!\n");
-							cam.look_at(vec3(PosX, PosY, PosZ), vec3(0, 0, -1), vec3(0, 1, 0));
+							Pos -= cam.axisZ;
+							printf("W %f,%f,%f\n", Pos.x(), Pos.y(), Pos.z());
+							cam.look_at(Pos, vec3(0, 0, -1), vec3(0, 1, 0));
 						}
 					}
 					if (event.type == SDL_KEYDOWN) {
 						if (event.key.keysym.sym == SDLK_s) {
-							PosZ++;
-							printf("Just pressed keyboard key S!\n");
-							cam.look_at(vec3(PosX, PosY, PosZ), vec3(0, 0, -1), vec3(0, 1, 0));
+							Pos += cam.axisZ;
+							printf("S %f,%f,%f\n", Pos.x(), Pos.y(), Pos.z());
+							cam.look_at(Pos, vec3(0, 0, -1), vec3(0, 1, 0));
 						}
 					}
 					if (event.type == SDL_KEYDOWN) {
 						if (event.key.keysym.sym == SDLK_d) {
-							PosX--;
-							printf("Just pressed keyboard key D!\n");
-							cam.look_at(vec3(PosX, PosY, PosZ), vec3(0, 0, -1), vec3(0, 1, 0));
+							Pos -= cam.axisX;
+							printf("D %f,%f,%f\n", Pos.x(), Pos.y(), Pos.z());
+							cam.look_at(Pos, vec3(0, 0, -1), vec3(0, 1, 0));
 						}
 					}
 
@@ -161,7 +159,7 @@ int main(int argc, char* argv[])
 							
 							vec3 RDWorld;
 
-							cam.worldToCamera.mult_vec_matrix(RayDirection, RDWorld);
+							cam.camToWorld.mult_vec_matrix(RayDirection, RDWorld);
 							
 							RDWorld.make_unit_vector();
 
