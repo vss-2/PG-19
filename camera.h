@@ -12,8 +12,8 @@
 	#include <SDL2/SDL.h>
 #endif
 
-const int WIDTH = 800;
-const int HEIGHT = 600;
+const int WIDTH = 600;
+const int HEIGHT = 400;
 
 class camera
 {
@@ -88,182 +88,118 @@ public:
 
 		praster = vec2((1 + algo2.x()) / 2 * imgWidth, (1 - algo2.y()) / 2 * imgHeight);
 
-		if ((bottom <= algo.y() && algo.y() <= top) && (left <= algo.x() && algo.x() <= right)) 
+		vec3 estouNaFrente = pWorld - _from;
+
+		estouNaFrente.make_unit_vector();
+
+		float produtoEscalarMenorZero = dot(estouNaFrente, axisZ);
+
+		// Estamos vendo se a camera está dentro do macaco, fazendo produto escalar com o eixo para ver
+
+		if ((bottom <= algo.y() && algo.y() <= top) && (left <= algo.x() && algo.x() <= right) && produtoEscalarMenorZero <= 0) 
 		{
 			return true;
-		}
-		else 
-		{
+		} else {
+
 			return false;
-			// calcula a cos(de algo), se der positivo, da false
+			//calcula a cos(de algo), se der positivo, da false
 		}
+
 	}
 
-	void desenharLinha(SDL_Renderer *renderer, vec2 &p0, vec2 &p1)
-	{
-		vec2 start = p1;
-        vec2 diretor = p0-p1;
+	void desenharLinha(SDL_Renderer *vemDoMain, vec2 &ponto1, vec2 &ponto2){
+		vec2 diretor = ponto1-ponto2;
 		int fInt = (int) diretor.length();
 		diretor.make_unit_vector();
 
-		for(int i = 0; i <= fInt; i++)
-		{
-			SDL_RenderDrawPoint(renderer, (int) start.x(), (int) start.y());
-			start += diretor;
+		for(int iter = 0; iter < fInt; iter++){
+			SDL_RenderDrawPoint(vemDoMain, ponto2.x(), ponto2.y());
+			ponto2 += diretor;
 		}
+		
+		
 	}
 
 	int getOutcode(vec2 p, int xMin, int xMax, int yMin, int yMax){
-		int bits   = 0;
 		int inside = 0;
 		int left   = 1;
 		int right  = 2;
 		int bottom = 4;
 		int top    = 8;
 		
-		if(p.y() > yMax)
-		{
-			bits = top    | inside;
+		if(p.y() > yMax){
+			inside = top    |= inside;
 		}
-
-		if(p.y() < yMin)
-		{
-			bits = bottom | inside;
+		if(p.y() < yMin){
+			inside = bottom |= inside;
 		}
-
-		if(p.x() > xMax)
-		{
-			bits = right  | inside;
+		if(p.x() > xMax){
+			inside = right  |= inside;
 		}
-
-		if(p.x() < xMin)
-		{
-			bits = left   | inside;
+		if(p.x() < xMin){
+			inside = left   |= inside;
 		}
-
-		if(p.y() > yMax && p.x() > xMax)
-		{	// Top-Right
-			bits = top    | right;
-		}
-
-		if(p.y() < yMin && p.x() < xMin)
-		{	// Bottom-Left
-			bits = bottom | left;
-		}
-
-		if(p.x() > xMax && p.y() < yMin)
-		{	// Bottom-Right
-			bits = right  | right;
-		}
-
-		if(p.x() < xMin && p.y() > yMax)
-		{	// Top-Left
-			bits = left   | top;
-		}
-
-		// if((xMin < p.x() < xMax) and (yMin < p.y() < yMax))
-		// {	// Inside
-		// 	bits = inside;
-		// }
-
-		// if(bits != 0)
-			// printf("O bits retornou: %i\n", bits);
-
-		return bits;
+		return inside;
 	}
 
-
-
-	bool ClipLine(vec2 &bkprasterA, vec2 &bkprasterB, int xMin, int xMax, int yMin, int yMax)
-	{
-		int outcode0 = getOutcode(bkprasterA, xMin, xMax, yMin, yMax);
-		int outcode1 = getOutcode(bkprasterB, xMin, xMax, yMin, yMax);
+	bool ClipLine(vec2 &p0, vec2 &p1, int xMin, int xMax, int yMin, int yMax){
+		int outcode0 = getOutcode(p0, xMin, xMax, yMin, yMax);
+		int outcode1 = getOutcode(p1, xMin, xMax, yMin, yMax);
 		
-		float slope, novoX, novoY = 0;
+		float slope = (p1.y() - p0.y())/(p1.x() - p0.x());
+		float novoX, novoY = 0;
 
 		bool accept = false;
 
 		while(true){
-			if(outcode0 == 0 & outcode1 == 0)
-			{
+			if(outcode0 == 0 and outcode1 == 0){
 				accept = true;
 				break;
-			} 
-			else if (outcode0 & outcode1)
-			{
+			} else if (outcode0 and outcode1){
 				break;
 			} else {
 				// Pelo menos um ponto está fora da janela
-
 				int outcodeOutside = outcode1 != 0? outcode1 : outcode0;
-				// printf("O outcodeOutside é: %i\n", outcodeOutside);
-
 				// Calcula x e y para interseção com top, bottom, right e left
-				if (outcodeOutside & 8)
-				{
-                    slope = (bkprasterB.y() - bkprasterA.y())/(bkprasterB.x() - bkprasterA.x());
-					novoX = bkprasterA.x() + (1.0f/slope)*(yMax - bkprasterA.y());
-					novoY = yMax;
-					// printf("Entrei no TOP\n");
-				} else if (outcodeOutside & 4)
-				{
-                    slope = (bkprasterB.y() - bkprasterA.y())/(bkprasterB.x() - bkprasterA.x());
-					novoX = bkprasterA.x() + (1.0f/slope)*(yMin - bkprasterA.y());
-					novoY = yMin;
-					// printf("Entrei no BOT\n");
-				} else if (outcodeOutside & 2)
-				{
-                    slope = (bkprasterB.y() - bkprasterA.y())/(bkprasterB.x() - bkprasterA.x());
-					novoY = bkprasterA.y() + slope*(xMax - bkprasterA.x());
-					novoX = xMax; 
-					// printf("Entrei no RGT\n");
-				} else if (outcodeOutside & 1)
-				{
-                    slope = (bkprasterB.y() - bkprasterA.y())/(bkprasterB.x() - bkprasterA.x());
-					novoY = bkprasterA.y() + slope*(xMin - bkprasterA.x());
-					novoX = xMin;
-					// printf("Entrei no LFT\n");
+				if (outcodeOutside and top){
+					novoX = p0.x() + (1.0/slope)*(xMax - p0.x());
+					novoY = p0.y() + slope*(yMax - p0.y());
+				} else if (outcodeOutside and bottom){
+					novoX = p0.x() + (1.0/slope)*(xMax - p0.x());
+					novoY = p0.y() + slope*(yMin - p0.y());
+				} else if (outcodeOutside and right){
+					novoX = p0.x() + (1.0/slope)*(xMax - p0.x());
+					novoY = p0.y() + slope*(yMax - p0.y());
+				} else if (outcodeOutside and left){
+					novoX = p0.x() + (1.0/slope)*(xMin - p0.x());
+					novoY = p0.y() + slope*(yMax - p0.y());
 				}
-                    
-				// printf("Slope: %f, novoX: %f, novoY: %f", slope, novoX, novoY);
-				// printf("OutcodeOutside:%i\nOutcode0:%i\nOutcode1:%i\n", outcodeOutside, outcode0, outcode1);
-				if (outcodeOutside == outcode0)
-				{
-					// printf("Outcode0 é igual\n");
-                    bkprasterA[0] = novoX;
-                    bkprasterA[1] = novoY;
-					outcode0 = getOutcode(bkprasterB, xMin, xMax, yMin, yMax);
-					// outcode0 = 1;
-					// outcode1 = 1;
+				if (outcodeOutside == outcode0){
+					vec2 p0(novoX, novoY);
+					
+					outcode0 = getOutcode(p0, xMin, xMax, yMin, yMax);
 				} else {
-                    bkprasterB[0] = novoX;
-                    bkprasterB[1] = novoY;
-                    // printf("Slope: %f, novoX: %f, novoY: %f",slope ,novoX, novoY);
-					outcode1 = getOutcode(bkprasterA, xMin, xMax, yMin, yMax);
-					// outcode0 = 1;
-					// outcode1 = 1;
-					// printf("Atualizei outcode1: %i\n", outcode1);
+
+					outcode1 = getOutcode(p1, xMin, xMax, yMin, yMax);
 				}
 			}
 		}
 		return accept;
 	}
 
-	void render_scene(std::vector<Obj> objs, SDL_Renderer* renderer){
-		int PosX = 0;
-		int PosY = 0;
-		int PosZ = 4;
+
+	void render_scene(std::vector<Obj> objs, SDL_Renderer* renderer) {
+
 		vec3 light(0.0f, 0.0f, -1.0f);
 		light.make_unit_vector();
-		int aa = 0;
 
 		for (auto obj : objs) 
 		{
 			for (int i = 0; i < obj.mesh.tris.size(); i++)
 			{
-				vec2 praster1, praster2, praster3;
-				vec2 bkprasterA, bkprasterB;
-
+				vec2 praster1;
+				vec2 praster2;
+				vec2 praster3;
 				vec3 col(255, 255, 255);
 				SDL_SetRenderDrawColor(renderer, 255, 255, 255, SDL_ALPHA_OPAQUE);
 
@@ -273,34 +209,12 @@ public:
 				v3 = compute_pixel_coordinates(obj.mesh.tris[i].vertex[2].pos, praster3);
 
 				if (v1 && v2)
-                {
-					bkprasterA = praster1;
-					bkprasterB = praster2;
-                    if(ClipLine(bkprasterA, bkprasterB, 0, WIDTH, 0, HEIGHT))
-                    {
-                    	desenharLinha(renderer, bkprasterA, bkprasterB);
-                    }
-                }
-
+					desenharLinha(renderer, praster1, praster2);
 				if (v1 && v3)
-                {
-					bkprasterA = praster1;
-					bkprasterB = praster3;
-                    if(ClipLine(bkprasterA, bkprasterB, 0, WIDTH, 0, HEIGHT))
-                    {
-                    	desenharLinha(renderer, bkprasterA, bkprasterB);
-                    }
-                }
-
+					desenharLinha(renderer, praster1, praster3);
 				if (v2 && v3)
-                {
-					bkprasterA = praster2;
-					bkprasterB = praster3;
-                    if(ClipLine(bkprasterA, bkprasterB, 0, WIDTH, 0, HEIGHT))
-                    {
-                    	desenharLinha(renderer, bkprasterA, bkprasterB);
-                    }                    
-                }
+					desenharLinha(renderer, praster2, praster3);
+				
 			}
 		}
 	}
