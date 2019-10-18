@@ -5,6 +5,8 @@
 #include "ImGUI/imgui_sdl.h"
 #include "ImGUI/imgui.h"
 
+int aaa = 0;
+
 bool insideoutsidetest(Triangle triangle, vec3 &P){
     
     vec3 p1 = triangle.vertex[0].pos;
@@ -17,9 +19,9 @@ bool insideoutsidetest(Triangle triangle, vec3 &P){
     vec3 cOut2 = -cross(P - p2, p3 - p2);
     vec3 cOut3 = -cross(P - p3, p1 - p3);
 
-    if((dot(cOut1, normTriag) < 0 && dot(cOut2, normTriag) < 0) && dot(cOut3, normTriag) < 0)
+    if((dot(cOut1, normTriag) > 0 && dot(cOut2, normTriag) > 0) && dot(cOut3, normTriag) > 0)
     {
-		printf("true\n");
+		// printf("true\n");
         return true;
     }
 	// printf("false\n");
@@ -34,7 +36,8 @@ int main(int argc, char* argv[])
 		SDL_Renderer* renderer = SDL_CreateRenderer(window, -1, SDL_RENDERER_ACCELERATED);
 
 		if (window && renderer) {
-			vec3 Pos = vec3 (0,0,4);
+			vec3 Pos = vec3 (0,0,2);
+			vec3 At = vec3 (0,0,-1);
 			SDL_bool done = SDL_FALSE;
 			SDL_SetRelativeMouseMode(SDL_FALSE);
 
@@ -98,37 +101,41 @@ int main(int argc, char* argv[])
 
 				ImGui::Render();
 				ImGuiSDL::Render(ImGui::GetDrawData());
-				SDL_RenderPresent(renderer); // present the generated triangle data onto screen
 
+				SDL_RenderPresent(renderer); // present the generated triangle data onto screen
 				
 				while (SDL_PollEvent(&event)) {
 
 					if (event.type == SDL_KEYDOWN) {
 						if (event.key.keysym.sym == SDLK_a) {
 							Pos += cam.axisX;
+							At += cam.axisX; 
 							printf("A %f,%f,%f\n", Pos.x(), Pos.y(), Pos.z());
-							cam.look_at(Pos, vec3(0, 0, -1), vec3(0, 1, 0));
+							cam.look_at(Pos, At, vec3(0, 1, 0));
 						}
 					}
 					if (event.type == SDL_KEYDOWN) {
 						if (event.key.keysym.sym == SDLK_w) {
 							Pos -= cam.axisZ;
+							At -= cam.axisZ;
 							printf("W %f,%f,%f\n", Pos.x(), Pos.y(), Pos.z());
-							cam.look_at(Pos, vec3(0, 0, -1), vec3(0, 1, 0));
+							cam.look_at(Pos,At, vec3(0, 1, 0));
 						}
 					}
 					if (event.type == SDL_KEYDOWN) {
 						if (event.key.keysym.sym == SDLK_s) {
 							Pos += cam.axisZ;
+							At += cam.axisZ;
 							printf("S %f,%f,%f\n", Pos.x(), Pos.y(), Pos.z());
-							cam.look_at(Pos, vec3(0, 0, -1), vec3(0, 1, 0));
+							cam.look_at(Pos,At, vec3(0, 1, 0));
 						}
 					}
 					if (event.type == SDL_KEYDOWN) {
 						if (event.key.keysym.sym == SDLK_d) {
 							Pos -= cam.axisX;
+							At -= cam.axisX;
 							printf("D %f,%f,%f\n", Pos.x(), Pos.y(), Pos.z());
-							cam.look_at(Pos, vec3(0, 0, -1), vec3(0, 1, 0));
+							cam.look_at(Pos,At, vec3(0, 1, 0));
 						}
 					}
 
@@ -147,15 +154,13 @@ int main(int argc, char* argv[])
 							//every frame. Useful if you want to use mouse and not worry
 							//about it going off screen
 
-							int mousePosX, mousePosY;
-							SDL_GetMouseState(&mousePosX, &mousePosY);
-
-							float Pmainx = mousePosX/1.0;
-							float Pmainy = mousePosY/1.0;
+							int x, y;
+							SDL_GetMouseState(&x, &y);
+							
 							//SDL_SetRelativeMouseMode(SDL_TRUE);
-							Pmainx = -(2 * (Pmainx/WIDTH) - 1) * cam.right/cam._near;
-							Pmainy = (1 - 2*(Pmainy/HEIGHT)) * cam.top/cam._near;
-							vec3 RayDirection = vec3(Pmainx, Pmainy, -1);
+							float Px = -(2 * ((float)x/(float)WIDTH) - 1) * cam.right/cam._near;
+							float Py = (1 - 2*((float)y/(float)HEIGHT)) * cam.top/cam._near;
+							vec3 RayDirection = vec3(Px, Py, -1);
 							
 							vec3 RDWorld;
 
@@ -191,7 +196,8 @@ int main(int argc, char* argv[])
 									}
 									if(res)
 									{
-										printf("clicou\n");
+										aaa++;
+										printf("clicou %d\n",aaa);
 									}
 								}
 							
