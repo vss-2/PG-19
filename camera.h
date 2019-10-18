@@ -38,7 +38,7 @@ public:
 		float radfov = fov * (3.141592f / 180.f);
 		top = tan(radfov / 2.f);
 		bottom = -top;
-		aspectRatio = (float)(windowWidth / windowHeight);
+		aspectRatio = (float)(windowWidth) / windowHeight;
 		right = tan(radfov / 2.f) * aspectRatio;
 		left = -right;
 
