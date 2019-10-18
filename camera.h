@@ -38,7 +38,7 @@ public:
 		float radfov = fov * (3.141592f / 180.f);
 		top = tan(radfov / 2.f);
 		bottom = -top;
-		aspectRatio = windowWidth / windowHeight;
+		aspectRatio = (float)(windowWidth / windowHeight);
 		right = tan(radfov / 2.f) * aspectRatio;
 		left = -right;
 
@@ -108,13 +108,14 @@ public:
 	}
 
 	void desenharLinha(SDL_Renderer *vemDoMain, vec2 &ponto1, vec2 &ponto2){
-		vec2 diretor = ponto1-ponto2;
+		vec2 diretor = ponto1 - ponto2;
 		int fInt = (int) diretor.length();
 		diretor.make_unit_vector();
-
+		
+		vec2 aux = ponto2;
 		for(int iter = 0; iter < fInt; iter++){
-			SDL_RenderDrawPoint(vemDoMain, ponto2.x(), ponto2.y());
-			ponto2 += diretor;
+			SDL_RenderDrawPoint(vemDoMain, aux.x(), aux.y());
+			aux += diretor;
 		}
 		
 		
@@ -152,34 +153,31 @@ public:
 		bool accept = false;
 
 		while(true){
-			if(outcode0 == 0 and outcode1 == 0){
+			if(outcode0 == 0 && outcode1 == 0){
 				accept = true;
 				break;
-			} else if (outcode0 and outcode1){
+			} else if (outcode0 & outcode1){
 				break;
 			} else {
-				// Pelo menos um ponto está fora da janela
 				int outcodeOutside = outcode1 != 0? outcode1 : outcode0;
-				// Calcula x e y para interseção com top, bottom, right e left
-				if (outcodeOutside and top){
-					novoX = p0.x() + (1.0/slope)*(xMax - p0.x());
-					novoY = p0.y() + slope*(yMax - p0.y());
-				} else if (outcodeOutside and bottom){
-					novoX = p0.x() + (1.0/slope)*(xMax - p0.x());
-					novoY = p0.y() + slope*(yMin - p0.y());
-				} else if (outcodeOutside and right){
-					novoX = p0.x() + (1.0/slope)*(xMax - p0.x());
-					novoY = p0.y() + slope*(yMax - p0.y());
-				} else if (outcodeOutside and left){
-					novoX = p0.x() + (1.0/slope)*(xMin - p0.x());
-					novoY = p0.y() + slope*(yMax - p0.y());
+				if (outcodeOutside & 8){
+					novoX = p0.x() + (1.0/slope)*((float)yMax - p0.y());
+					novoY = (float)yMax;
+				} else if (outcodeOutside & 4){
+					novoX = p0.x() + (1.0/slope)*((float)yMin - p0.y());
+					novoY = yMin;
+				} else if (outcodeOutside & 2){
+					novoX = (float)xMax;
+					novoY = p0.y() + slope*((float)xMax - p0.x());
+				} else if (outcodeOutside & 1){
+					novoX = (float)xMin;
+					novoY = p0.y() + slope*(xMin - p0.x());
 				}
 				if (outcodeOutside == outcode0){
-					vec2 p0(novoX, novoY);
-					
+					p0 = vec2(novoX, novoY);
 					outcode0 = getOutcode(p0, xMin, xMax, yMin, yMax);
 				} else {
-
+					p1 = vec2(novoX, novoY);
 					outcode1 = getOutcode(p1, xMin, xMax, yMin, yMax);
 				}
 			}
@@ -206,15 +204,35 @@ public:
 				bool v1, v2, v3;
 				v1 = compute_pixel_coordinates(obj.mesh.tris[i].vertex[0].pos, praster1);
 				v2 = compute_pixel_coordinates(obj.mesh.tris[i].vertex[1].pos, praster2);
-				v3 = compute_pixel_coordinates(obj.mesh.tris[i].vertex[2].pos, praster3);
+				v3 = compute_pixel_coordinates(obj.mesh.tris[i].vertex[2].pos, praster3);				
 
-				if (v1 && v2)
-					desenharLinha(renderer, praster1, praster2);
-				if (v1 && v3)
-					desenharLinha(renderer, praster1, praster3);
-				if (v2 && v3)
-					desenharLinha(renderer, praster2, praster3);
-				
+
+
+
+				if (v1 && v2){
+					vec2 aux_praster1 = praster1;
+					vec2 aux_praster2 = praster2;
+
+					if(ClipLine(aux_praster1, aux_praster2, 0, WIDTH, 0, HEIGHT)){
+						desenharLinha(renderer, aux_praster1, aux_praster2);
+					}
+				}
+				if (v1 && v3){
+					vec2 aux_praster1 = praster1;
+					vec2 aux_praster3 = praster3;
+
+					if(ClipLine(aux_praster1, aux_praster3, 0, WIDTH, 0, HEIGHT)){
+						desenharLinha(renderer, aux_praster1, aux_praster3);
+					}
+				}
+				if (v2 && v3){
+					vec2 aux_praster2 = praster2;
+					vec2 aux_praster3 = praster3;
+
+					if(ClipLine(aux_praster2, aux_praster3, 0, WIDTH, 0, HEIGHT)){
+						desenharLinha(renderer, aux_praster2, aux_praster3);
+					}
+				}
 			}
 		}
 	}
