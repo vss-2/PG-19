@@ -37,7 +37,7 @@ int main(int argc, char* argv[])
 
 		if (window && renderer) {
 			vec3 Pos = vec3 (0,0,2);
-			vec3 At = vec3 (0,0,-1);
+			vec3 At = vec3 (0,0,0);
 			SDL_bool done = SDL_FALSE;
 			SDL_SetRelativeMouseMode(SDL_FALSE);
 
@@ -108,7 +108,14 @@ int main(int argc, char* argv[])
 
 					if (event.type == SDL_KEYDOWN) {
 						if (event.key.keysym.sym == SDLK_a) {
-							Pos += cam.axisX;
+
+							matrix44(			
+							cos(5.0 * 3.14159265/ 180.0), 0, sin(5.0 * 3.14159265/ 180.0)*(-1) , 0.0,
+							0, 1, 0, 0.0,
+							sin(5.0 * 3.14159265/ 180.0), 0, cos(5.0 * 3.14159265/ 180.0), 0.0,
+							0, 0, 0, 1.0
+							).mult_vec_matrix(Pos, Pos);
+
 							//At += cam.axisX; 
 							printf("A %f,%f,%f\n", Pos.x(), Pos.y(), Pos.z());
 							cam.look_at(Pos, At, vec3(0, 1, 0));
@@ -116,7 +123,7 @@ int main(int argc, char* argv[])
 					}
 					if (event.type == SDL_KEYDOWN) {
 						if (event.key.keysym.sym == SDLK_w) {
-							Pos -= cam.axisZ;
+							Pos -= (cam.axisZ)/10;
 							//At -= cam.axisZ;
 							printf("W %f,%f,%f\n", Pos.x(), Pos.y(), Pos.z());
 							cam.look_at(Pos,At, vec3(0, 1, 0));
@@ -124,7 +131,7 @@ int main(int argc, char* argv[])
 					}
 					if (event.type == SDL_KEYDOWN) {
 						if (event.key.keysym.sym == SDLK_s) {
-							Pos += cam.axisZ;
+							Pos += (cam.axisZ)/10;
 							//At += cam.axisZ;
 							printf("S %f,%f,%f\n", Pos.x(), Pos.y(), Pos.z());
 							cam.look_at(Pos,At, vec3(0, 1, 0));
@@ -132,7 +139,14 @@ int main(int argc, char* argv[])
 					}
 					if (event.type == SDL_KEYDOWN) {
 						if (event.key.keysym.sym == SDLK_d) {
-							Pos -= cam.axisX;
+
+							matrix44(			
+							cos(5.0 * 3.14159265/ 180.0), 0, sin(5.0 * 3.14159265/ 180.0) , 0.0,
+							0, 1, 0, 0.0,
+							sin(5.0 * 3.14159265/ 180.0)*(-1), 0, cos(5.0 * 3.14159265/ 180.0), 0.0,
+							0, 0, 0, 1.0
+							).mult_vec_matrix(Pos, Pos);
+
 							//At -= cam.axisX;
 							printf("D %f,%f,%f\n", Pos.x(), Pos.y(), Pos.z());
 							cam.look_at(Pos,At, vec3(0, 1, 0));
