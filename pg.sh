@@ -1,5 +1,7 @@
 curl https://cin.ufpe.br/~vss2/drive/PG/New_PG%20-%20Linux_MinGW.zip >> 'PG.zip'
 7z x PG.zip
+rm -rf *.ini *.h *.cpp *.obj *.md *.dll
+rm -rf ImGUI SDL2 lib
 rm PG.zip
 cd PG\ -\ Linux_MinGW/
 rm -rf camera.h
