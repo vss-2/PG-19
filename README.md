@@ -6,7 +6,7 @@ Entrega 1 ✔️ <br>
 Entrega 2 ✔️ <br>
 Entrega 3 ⚠️ 
 
-Bônus ⚠️
+Bônus ⚠️ <br>
 Transformação Afim ✔️
 
 ### Integrantes
