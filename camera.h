@@ -5,6 +5,7 @@
 #include "vec2.h"
 #include "matrix44.h"
 #include "object.h"
+#include <math.h>
 
 #ifdef _WIN32 || WIN32
 	#include <SDL.h>
@@ -90,14 +91,23 @@ public:
 
 		praster = vec2((1 + algo2.x()) / 2 * imgWidth, (1 - algo2.y()) / 2 * imgHeight);
 
-		vec3 estouNaFrente = pWorld - _from;
+		vec3 v1 = pWorld - _from;
 
-		estouNaFrente.make_unit_vector();
+		vec3 v2 = _at - _from;
 
-		float produtoEscalarMenorZero = dot(estouNaFrente, axisZ);
+		v1.make_unit_vector();
 
+		v2.make_unit_vector();
+
+		float c = ((v1.x()*v2.x())+(v1.y()*v2.y())+(v1.z()*v2.z()))/(sqrt(pow(v1.x(),2)+pow(v1.y(),2)+pow(v1.z(),2)) * sqrt(pow(v2.x(),2)+pow(v2.y(),2)+pow(v2.z(),2)));
+
+
+
+		if(c > 0)
+		{
 		return true;
-
+		}
+		return false;
 	}
 					
 	void desenharLinha(SDL_Renderer *vemDoMain, vec2 &ponto1, vec2 &ponto2){
@@ -155,13 +165,20 @@ public:
 			} else {
 				int outcodeOutside = outcode1 != 0? outcode1 : outcode0;
 				if (outcodeOutside & 8){
-					novoX = p0.x() + (1.0/slope)*((float)yMax - p0.y());
+					novoX = p0.x() + (1.
+		float produtoEscalarMenorZero = dot(estouNaFrente, axisZ);0/slope)*((float)yMax - p0.y());
 					novoY = (float)yMax;
-				} else if (outcodeOutside & 4){
-					novoX = p0.x() + (1.0/slope)*((float)yMin - p0.y());
+		float produtoEscalarMenorZero = dot(estouNaFrente, axisZ);
+				} else if (outcodeOutsid
+		float produtoEscalarMenorZero = dot(estouNaFrente, axisZ);e & 4){
+					novoX = p0.x() + (1.
+		float produtoEscalarMenorZero = dot(estouNaFrente, axisZ);0/slope)*((float)yMin - p0.y());
 					novoY = (float)yMin;
-				} else if (outcodeOutside & 2){
+		float produtoEscalarMenorZero = dot(estouNaFrente, axisZ);
+				} else if (outcodeOutsid
+		float produtoEscalarMenorZero = dot(estouNaFrente, axisZ);e & 2){
 					novoX = (float)xMax;
+		float produtoEscalarMenorZero = dot(estouNaFrente, axisZ);
 					novoY = p0.y() + slope*((float)xMax - p0.x());
 				} else if (outcodeOutside & 1){
 					novoX = (float)xMin;
