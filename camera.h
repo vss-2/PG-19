@@ -165,20 +165,13 @@ public:
 			} else {
 				int outcodeOutside = outcode1 != 0? outcode1 : outcode0;
 				if (outcodeOutside & 8){
-					novoX = p0.x() + (1.
-		float produtoEscalarMenorZero = dot(estouNaFrente, axisZ);0/slope)*((float)yMax - p0.y());
+					novoX = p0.x() + (1.0/slope)*((float)yMax - p0.y());
 					novoY = (float)yMax;
-		float produtoEscalarMenorZero = dot(estouNaFrente, axisZ);
-				} else if (outcodeOutsid
-		float produtoEscalarMenorZero = dot(estouNaFrente, axisZ);e & 4){
-					novoX = p0.x() + (1.
-		float produtoEscalarMenorZero = dot(estouNaFrente, axisZ);0/slope)*((float)yMin - p0.y());
+				} else if (outcodeOutside & 4){
+					novoX = p0.x() + (1.0/slope)*((float)yMin - p0.y());
 					novoY = (float)yMin;
-		float produtoEscalarMenorZero = dot(estouNaFrente, axisZ);
-				} else if (outcodeOutsid
-		float produtoEscalarMenorZero = dot(estouNaFrente, axisZ);e & 2){
+				} else if (outcodeOutside & 2){
 					novoX = (float)xMax;
-		float produtoEscalarMenorZero = dot(estouNaFrente, axisZ);
 					novoY = p0.y() + slope*((float)xMax - p0.x());
 				} else if (outcodeOutside & 1){
 					novoX = (float)xMin;
