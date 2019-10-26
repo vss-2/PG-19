@@ -1,0 +1,18 @@
+Ka = é a cor da constante de ambiente do objeto
+Ia = intensidade da luz ambiente 
+Im = intensidade da fonte de luz atual somatório para todas as fontes de luz da cena
+Kd = é a constante difusa
+Ks = é a constante especular
+N  = normal do triângulo
+L  = vetor diretor do raio
+r  = L - 2 * (dot(N,L))*N
+v  = vetor de direção da câmera
+
+Ka  = RGB
+IA = max(0.0f, dot(normalTriangulo, vetordiretordoRaiodeLuz)
+Im = Ia
+kd = K
+Ks = 0.1
+n  = 50
+l  = (0,0,-1)
+r  = L - 2 * (dot(N,L))^n
