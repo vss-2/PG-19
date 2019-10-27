@@ -24,4 +24,5 @@ vt.x() = vt.x() * imgWidth;
 vt.y() = vt.y() * imgHeight;
 ```
 
+#### Obs: Os .x() e .y() em vt são implementados como float, já ajustei para int no texture_buffer do object.h, como avisado no slide.
 
