@@ -110,14 +110,14 @@ int main(int argc, char* argv[])
 						if (event.key.keysym.sym == SDLK_a) {
 
 							matrix44(			
-							cos(5.0 * 3.14159265/ 180.0), 0, sin(5.0 * 3.14159265/ 180.0)*(-1) , 0.0,
+							cos(2.0 * 3.14159265/ 180.0), 0, sin(2.0 * 3.14159265/ 180.0)*(-1) , 0.0,
 							0, 1, 0, 0.0,
-							sin(5.0 * 3.14159265/ 180.0), 0, cos(5.0 * 3.14159265/ 180.0), 0.0,
+							sin(2.0 * 3.14159265/ 180.0), 0, cos(2.0 * 3.14159265/ 180.0), 0.0,
 							0, 0, 0, 1.0
 							).mult_vec_matrix(Pos, Pos);
 
-							//At += cam.axisX; 
-							printf("A %f,%f,%f\n", Pos.x(), Pos.y(), Pos.z());
+							// At += cam.axisX; 
+							// printf("A %f,%f,%f\n", Pos.x(), Pos.y(), Pos.z());
 							cam.look_at(Pos, At, vec3(0, 1, 0));
 						}
 					}
@@ -125,7 +125,7 @@ int main(int argc, char* argv[])
 						if (event.key.keysym.sym == SDLK_w) {
 							Pos -= (cam.axisZ)/10;
 							//At -= cam.axisZ;
-							printf("W %f,%f,%f\n", Pos.x(), Pos.y(), Pos.z());
+							// printf("W %f,%f,%f\n", Pos.x(), Pos.y(), Pos.z());
 							cam.look_at(Pos,At, vec3(0, 1, 0));
 						}
 					}
@@ -133,7 +133,7 @@ int main(int argc, char* argv[])
 						if (event.key.keysym.sym == SDLK_s) {
 							Pos += (cam.axisZ)/10;
 							//At += cam.axisZ;
-							printf("S %f,%f,%f\n", Pos.x(), Pos.y(), Pos.z());
+							// printf("S %f,%f,%f\n", Pos.x(), Pos.y(), Pos.z());
 							cam.look_at(Pos,At, vec3(0, 1, 0));
 						}
 					}
@@ -141,14 +141,54 @@ int main(int argc, char* argv[])
 						if (event.key.keysym.sym == SDLK_d) {
 
 							matrix44(			
-							cos(5.0 * 3.14159265/ 180.0), 0, sin(5.0 * 3.14159265/ 180.0) , 0.0,
+							cos(2.0 * 3.14159265/ 180.0), 0, sin(2.0 * 3.14159265/ 180.0) , 0.0,
 							0, 1, 0, 0.0,
-							sin(5.0 * 3.14159265/ 180.0)*(-1), 0, cos(5.0 * 3.14159265/ 180.0), 0.0,
+							sin(2.0 * 3.14159265/ 180.0)*(-1), 0, cos(2.0 * 3.14159265/ 180.0), 0.0,
 							0, 0, 0, 1.0
 							).mult_vec_matrix(Pos, Pos);
 
 							//At -= cam.axisX;
-							printf("D %f,%f,%f\n", Pos.x(), Pos.y(), Pos.z());
+							// printf("D %f,%f,%f\n", Pos.x(), Pos.y(), Pos.z());
+							cam.look_at(Pos,At, vec3(0, 1, 0));
+						}
+					}
+					if (event.type == SDL_KEYDOWN) {
+						if (event.key.keysym.sym == SDLK_k) {
+							matrix44(
+							1, 0, 0, 0.0,
+							0, cos(2.0 * 3.14159265/ 180.0), sin(2.0 * 3.14159265/ 180.0) , 0.0,
+							0, sin(2.0 * 3.14159265/ 180.0)*(-1), cos(2.0 * 3.14159265/ 180.0), 0.0,
+							0, 0, 0, 1.0
+							).mult_vec_matrix(Pos, Pos);
+							//At += cam.axisZ;
+							// printf("I %f,%f,%f\n", Pos.x(), Pos.y(), Pos.z());
+							cam.look_at(Pos,At, vec3(0, 1, 0));
+						}
+					}
+					if (event.type == SDL_KEYDOWN) {
+						if (event.key.keysym.sym == SDLK_i) {
+							matrix44(
+							1, 0, 0, 0.0,
+							0, cos(2.0 * 3.14159265/ 180.0), sin(2.0 * 3.14159265/ 180.0)*(-1) , 0.0,
+							0, sin(2.0 * 3.14159265/ 180.0), cos(2.0 * 3.14159265/ 180.0), 0.0,
+							0, 0, 0, 1.0
+							).mult_vec_matrix(Pos, Pos);
+							//At += cam.axisZ;
+							// printf("K %f,%f,%f\n", Pos.x(), Pos.y(), Pos.z());
+							cam.look_at(Pos,At, vec3(0, 1, 0));
+						}
+					}
+					if (event.type == SDL_KEYDOWN) {
+						if (event.key.keysym.sym == SDLK_b) {
+							cam.Ia += 0.05f;
+							// printf("B Im = %f\n", cam.Ia);
+							cam.look_at(Pos,At, vec3(0, 1, 0));
+						}
+					}
+					if (event.type == SDL_KEYDOWN) {
+						if (event.key.keysym.sym == SDLK_v) {
+							cam.Ia -= 0.05f;
+							// printf("V Im = %f\n", cam.Ia);
 							cam.look_at(Pos,At, vec3(0, 1, 0));
 						}
 					}
@@ -211,7 +251,7 @@ int main(int argc, char* argv[])
 									if(res)
 									{
 										aaa++;
-										printf("clicou %d\n",aaa);
+										// printf("clicou %d\n",aaa);
 									}
 								}
 							

@@ -24,11 +24,11 @@ public:
 	float bottom, left, top, right, aspectRatio;
 	matrix44 camToWorld;
 	matrix44 worldToCamera;
-
+	float Ia = 1.0f;
 	vec3 _from, _at, _up;
 	vec3 axisX, axisY, axisZ;
 
-public:
+	public:
 	camera();
 	camera(const vec3& from, const vec3& at, const vec3& up,
 		const float& f, const float& n,
@@ -91,15 +91,15 @@ public:
 
 		praster = vec2((1 + algo2.x()) / 2 * imgWidth, (1 - algo2.y()) / 2 * imgHeight);
 
-		vec3 v1 = pWorld - _from;
+		vec3 v11 = pWorld - _from;
 
-		vec3 v2 = _at - _from;
+		vec3 v22 = _at - _from;
 
-		v1.make_unit_vector();
+		v11.make_unit_vector();
 
-		v2.make_unit_vector();
+		v22.make_unit_vector();
 
-		float c = ((v1.x()*v2.x())+(v1.y()*v2.y())+(v1.z()*v2.z()))/(sqrt(pow(v1.x(),2)+pow(v1.y(),2)+pow(v1.z(),2)) * sqrt(pow(v2.x(),2)+pow(v2.y(),2)+pow(v2.z(),2)));
+		float c = ((v11.x()*v22.x())+(v11.y()*v22.y())+(v11.z()*v22.z()))/(sqrt(pow(v11.x(),2)+pow(v11.y(),2)+pow(v11.z(),2)) * sqrt(pow(v22.x(),2)+pow(v22.y(),2)+pow(v22.z(),2)));
 
 
 
@@ -110,7 +110,8 @@ public:
 		return false;
 	}
 					
-	void desenharLinha(SDL_Renderer *vemDoMain, vec2 &ponto1, vec2 &ponto2){
+	void desenharLinha(SDL_Renderer *vemDoMain, vec2 &ponto1, vec2 &ponto2)
+	{
 		vec2 diretor = ponto1 - ponto2;
 		int fInt = (int) diretor.length();
 		diretor.make_unit_vector();
@@ -124,7 +125,8 @@ public:
 		
 	}
 
-	int getOutcode(vec2 p, int xMin, int xMax, int yMin, int yMax){
+	int getOutcode(vec2 p, int xMin, int xMax, int yMin, int yMax)
+	{
 		int inside = 0;
 		int left   = 1;
 		int right  = 2;
@@ -146,7 +148,8 @@ public:
 		return inside;
 	}
 
-	bool ClipLine(vec2 &p0, vec2 &p1, int xMin, int xMax, int yMin, int yMax){
+	bool ClipLine(vec2 &p0, vec2 &p1, int xMin, int xMax, int yMin, int yMax)
+	{
 		int outcode0 = getOutcode(p0, xMin, xMax, yMin, yMax);
 		int outcode1 = getOutcode(p1, xMin, xMax, yMin, yMax);
 		
@@ -189,9 +192,92 @@ public:
 		return accept;
 	}
 
+	bool Edge_function(float &Wa, float &Wa1, float &Wa2, float &Wa3, const vec2 &v0, const vec2 &v1, const vec2 &v2, const vec2 p)
+	{
+		vec2 vet0 = v0-v1;
+
+		vec2 vet1 = v0-v2;
+
+		Wa = vet0.x()*vet1.y() - vet0.y()*vet1.x();
+
+		vet0 = v1-v0;
+
+		vet1 = p-v0;
+
+		Wa1 = vet0.x()*vet1.y() - vet0.y()*vet1.x();
+
+		vet0 = v2-v1;
+
+		vet1 = p-v1;
+
+		Wa2 = vet0.x()*vet1.y() - vet0.y()*vet1.x();
+
+		vet0 = v0-v2;
+
+		vet1 = p-v2;
+
+		Wa3 = vet0.x()*vet1.y() - vet0.y()*vet1.x();
+
+		if(Wa1 >= 0 && Wa2 >= 0 && Wa3 >= 0)
+		{
+			return true;
+		}
+
+		return false;
+	}
+
+	void fill_triangle(SDL_Renderer *renderer, const vec2 &v0, const vec2 &v1, const vec2 &v2,
+	const Triangle &tr, const vec3 &light_dir)
+	{	
+		float Wa1;
+		float Wa2;
+		float Wa3;
+		float Wa;
+		float n = 3;
+		vec3 Kd(100, 100, 100);
+		vec3 Ks(50, 50, 50);
+		vec3 Ka(40, 40, 40);
+		vec3 v = axisZ;
+		v.make_unit_vector();
+		vec3 normal;
+
+		float xMin = fmin(fmin(v0.x(), v1.x()),v2.x());
+		float xMax = fmax(fmax(v0.x(), v1.x()),v2.x());
+		float yMin = fmin(fmin(v0.y(), v1.y()),v2.y());
+		float yMax = fmax(fmax(v0.y(), v1.y()),v2.y());
+		
+		for (int x = xMin; x < xMax ; x++)
+		{
+			for (int y = yMin; y < yMax; y++)
+			{
+				if(Edge_function(Wa, Wa1, Wa2, Wa3, v0, v1, v2, vec2(x,y))){
+					
+					vec3 color = PhongShading(Wa, Wa1, Wa2, Wa3, normal, tr, Ka*Ia, Kd, Ks, Ia, n, light_dir, v);
+					
+					SDL_SetRenderDrawColor(renderer, color.r(), color.g(), color.b(), 255);
+					SDL_RenderDrawPoint(renderer, x, y);
+				}
+
+			}
+		}
+	}
+
+	vec3 PhongShading(float &Wa, float Wa1, float Wa2, float Wa3, vec3 &normal, Triangle tr, vec3 KaIa, const vec3 Kd, const vec3 Ks, const float Im, const float n, vec3 l, vec3 v)
+	{
+		normal = (Wa2/Wa)*tr.vertex[0].norm + (Wa3/Wa)*tr.vertex[1].norm + (Wa1/Wa)*tr.vertex[2].norm;
+		//normal = cross(tr.vertex[2].pos - tr.vertex[0].pos, tr.vertex[1].pos - tr.vertex[0].pos);
+		normal.make_unit_vector();
+		vec3 r = l - 2*(dot(normal, l)) * normal;
+		r.make_unit_vector();
+
+		return KaIa + Im * (Kd * fmax(0.0f,dot(normal, l)) + Ks * pow(fmax(0.0f, dot(v, r)), n));
+	
+	}
+
 
 	void render_scene(std::vector<Obj> objs, SDL_Renderer* renderer) {
 
+		int aaaa = 0;
 		vec3 light(0.0f, 0.0f, -1.0f);
 		light.make_unit_vector();
 
@@ -208,36 +294,38 @@ public:
 				bool v1, v2, v3;
 				v1 = compute_pixel_coordinates(obj.mesh.tris[i].vertex[0].pos, praster1);
 				v2 = compute_pixel_coordinates(obj.mesh.tris[i].vertex[1].pos, praster2);
-				v3 = compute_pixel_coordinates(obj.mesh.tris[i].vertex[2].pos, praster3);				
-
-
-
+				v3 = compute_pixel_coordinates(obj.mesh.tris[i].vertex[2].pos, praster3);
+				vec2 aux_praster1 = praster1;
+				vec2 aux_praster2 = praster2;
+				vec2 aux_praster3 = praster3;			
 
 				if (v1 && v2){
-					vec2 aux_praster1 = praster1;
-					vec2 aux_praster2 = praster2;
+					aux_praster1 = praster1;
+					aux_praster2 = praster2;
 
 					if(ClipLine(aux_praster1, aux_praster2, 0, WIDTH, 0, HEIGHT)){
-						desenharLinha(renderer, aux_praster1, aux_praster2);
+						//desenharLinha(renderer, aux_praster1, aux_praster2);
 					}
 				}
 				if (v1 && v3){
-					vec2 aux_praster1 = praster1;
-					vec2 aux_praster3 = praster3;
+					aux_praster1 = praster1;
+					aux_praster3 = praster3;
 
 					if(ClipLine(aux_praster1, aux_praster3, 0, WIDTH, 0, HEIGHT)){
-						desenharLinha(renderer, aux_praster1, aux_praster3);
+						//desenharLinha(renderer, aux_praster1, aux_praster3);
 					}
 				}
 
 				if (v2 && v3){
-					vec2 aux_praster2 = praster2;
-					vec2 aux_praster3 = praster3;
+					aux_praster2 = praster2;
+					aux_praster3 = praster3;
 
 					if(ClipLine(aux_praster2, aux_praster3, 0, WIDTH, 0, HEIGHT)){
-						desenharLinha(renderer, aux_praster2, aux_praster3);
+						//desenharLinha(renderer, aux_praster2, aux_praster3);
 					}
 				}
+
+				fill_triangle(renderer, praster1,praster2,praster3,obj.mesh.tris[i], light);
 			}
 		}
 	}
